@@ -1,15 +1,18 @@
 package fr.hachim.quizapi.core.config;
 
-import fr.hachim.quizapi.core.plugin.PluginRegistry;
-import fr.hachim.quizapi.core.plugin.spi.QuizPlugin;
-import fr.hachim.quizapi.core.plugin.spi.SpringMvcPlugin;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import fr.hachim.quizapi.core.plugin.PluginRegistry;
+import fr.hachim.quizapi.core.plugin.spi.QuizPlugin;
+import fr.hachim.quizapi.core.plugin.spi.SpringMvcPlugin;
 import jakarta.annotation.PostConstruct;
-import java.util.Set;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Configuration pour l'infrastructure des plugins.
@@ -22,6 +25,7 @@ public class PluginConfig {
 
     private final PluginRegistry pluginRegistry;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
+    private final ApplicationContext applicationContext;
 
     /**
      * Initialise les contrôleurs REST des plugins activés.
@@ -32,7 +36,9 @@ public class PluginConfig {
     public void initializePluginControllers() {
         log.info("Initialisation des contrôleurs REST des plugins...");
         
-        for (QuizPlugin plugin : pluginRegistry.getEnabledPlugins()) {
+        for (QuizPlugin plugin : pluginRegistry.getAllPlugins().stream()
+                .filter(QuizPlugin::isEnabled)
+                .collect(Collectors.toList())) {
             if (plugin instanceof SpringMvcPlugin springMvcPlugin) {
                 registerPluginControllers(springMvcPlugin);
             }
@@ -55,7 +61,12 @@ public class PluginConfig {
         
         for (Object controller : controllers) {
             try {
-                requestMappingHandlerMapping.detectHandlerMethods(controller);
+                // Enregistrer le contrôleur dans le contexte Spring
+                applicationContext.getAutowireCapableBeanFactory().autowireBean(controller);
+                // Enregistrer les méthodes du contrôleur comme endpoints
+                requestMappingHandlerMapping.getHandlerMethods(); // Force l'initialisation
+                applicationContext.getAutowireCapableBeanFactory().initializeBean(controller, controller.getClass().getName());
+                // Utiliser registerMapping directement ou autre méthode appropriée
                 log.debug("Contrôleur enregistré : {}", controller.getClass().getName());
             } catch (Exception e) {
                 log.error("Erreur lors de l'enregistrement du contrôleur {} : {}", 
