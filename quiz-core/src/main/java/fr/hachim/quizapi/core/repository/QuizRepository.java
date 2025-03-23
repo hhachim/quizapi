@@ -125,4 +125,23 @@ public interface QuizRepository extends JpaRepository<Quiz, UUID> {
                    "ORDER BY COUNT(qa.id) DESC " +
                    "LIMIT :limit", nativeQuery = true)
     List<Quiz> findPopularQuizzes(@Param("limit") int limit);
+
+    /**
+     * Récupère les quiz créés par un utilisateur, avec pagination.
+     * 
+     * @param createdBy ID de l'utilisateur créateur
+     * @param pageable Options de pagination
+     * @return Page de quiz correspondants
+     */
+    Page<Quiz> findByCreatedByAndDeletedAtIsNull(UUID createdBy, Pageable pageable);
+    
+    /**
+     * Récupère les quiz dans une catégorie, avec pagination.
+     * 
+     * @param categoryId ID de la catégorie
+     * @param pageable Options de pagination
+     * @return Page de quiz correspondants
+     */
+    Page<Quiz> findByCategoryIdAndDeletedAtIsNull(UUID categoryId, Pageable pageable);
+
 }

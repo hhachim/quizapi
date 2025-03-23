@@ -1,25 +1,25 @@
 package fr.hachim.quizapi.core.service.impl;
 
+import fr.hachim.quizapi.core.exception.BusinessException;
+import fr.hachim.quizapi.core.exception.ResourceNotFoundException;
+import fr.hachim.quizapi.core.model.Quiz;
+import fr.hachim.quizapi.core.model.QuizTag;
+import fr.hachim.quizapi.core.model.QuizTagId;
+import fr.hachim.quizapi.core.repository.QuizRepository;
+import fr.hachim.quizapi.core.repository.QuizTagRepository;
+import fr.hachim.quizapi.core.service.QuizService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import fr.hachim.quizapi.core.exception.BusinessException;
-import fr.hachim.quizapi.core.exception.ResourceNotFoundException;
-import fr.hachim.quizapi.core.model.Quiz;
-import fr.hachim.quizapi.core.model.QuizTag;
-import fr.hachim.quizapi.core.repository.QuizRepository;
-import fr.hachim.quizapi.core.repository.QuizTagRepository;
-import fr.hachim.quizapi.core.service.QuizService;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Implémentation du service QuizService.
@@ -54,11 +54,8 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public Page<Quiz> findQuizzesByUser(UUID userId, Pageable pageable) {
-        return quizRepository.findAll((root, query, cb) -> 
-            cb.and(
-                cb.equal(root.get("createdBy"), userId),
-                cb.isNull(root.get("deletedAt"))
-            ), pageable);
+        // Utiliser une méthode plus simple si le repository ne supporte pas JpaSpecificationExecutor
+        return quizRepository.findByCreatedByAndDeletedAtIsNull(userId, pageable);
     }
 
     @Override
