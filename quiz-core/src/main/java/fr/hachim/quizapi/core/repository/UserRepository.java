@@ -1,30 +1,23 @@
 package fr.hachim.quizapi.core.repository;
 
-import fr.hachim.quizapi.core.model.User;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import fr.hachim.quizapi.core.model.User;
 
 /**
  * Repository pour l'entité User.
  * Fournit des méthodes d'accès aux données pour les utilisateurs.
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-    
-    /**
-     * Recherche un utilisateur par son UUID.
-     * 
-     * @param uuid L'UUID de l'utilisateur
-     * @return L'utilisateur trouvé (optionnel)
-     */
-    Optional<User> findByUuid(UUID uuid);
+public interface UserRepository extends JpaRepository<User, UUID> {
     
     /**
      * Recherche un utilisateur par son nom d'utilisateur.

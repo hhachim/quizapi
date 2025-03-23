@@ -1,6 +1,9 @@
 package fr.hachim.quizapi.core.repository;
 
-import fr.hachim.quizapi.core.model.Quiz;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,25 +11,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import fr.hachim.quizapi.core.model.Quiz;
 
 /**
  * Repository pour l'entité Quiz.
  * Fournit des méthodes d'accès aux données pour les quiz.
  */
 @Repository
-public interface QuizRepository extends JpaRepository<Quiz, Long> {
-    
-    /**
-     * Recherche un quiz par son UUID.
-     * 
-     * @param uuid L'UUID du quiz
-     * @return Le quiz trouvé (optionnel)
-     */
-    Optional<Quiz> findByUuid(UUID uuid);
+public interface QuizRepository extends JpaRepository<Quiz, UUID> {
     
     /**
      * Recherche des quiz par titre (recherche partielle).
@@ -42,7 +34,7 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
      * @param categoryId L'ID de la catégorie
      * @return Liste des quiz correspondants
      */
-    List<Quiz> findByCategoryIdAndDeletedAtIsNull(Long categoryId);
+    List<Quiz> findByCategoryIdAndDeletedAtIsNull(UUID categoryId);
     
     /**
      * Recherche des quiz par statut.
@@ -66,7 +58,7 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
      * @param createdBy L'ID de l'utilisateur créateur
      * @return Liste des quiz correspondants
      */
-    List<Quiz> findByCreatedByAndDeletedAtIsNull(Long createdBy);
+    List<Quiz> findByCreatedByAndDeletedAtIsNull(UUID createdBy);
     
     /**
      * Recherche des quiz publics.
@@ -115,7 +107,7 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
            "q.status = 'PUBLISHED'")
     Page<Quiz> findQuizzesByAdvancedSearch(
             @Param("searchTerm") String searchTerm,
-            @Param("categoryId") Long categoryId,
+            @Param("categoryId") UUID categoryId,
             @Param("difficultyLevel") String difficultyLevel,
             @Param("isPublic") Boolean isPublic,
             Pageable pageable);

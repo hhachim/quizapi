@@ -1,13 +1,12 @@
 -- V2__core_schema.sql
--- Tables fondamentales pour le Core
+-- Tables fondamentales pour le Core utilisant des UUIDs comme clés primaires
 
--- Extension pour les UUID (déjà créée dans V1)
+-- Extension pour les UUIDs (déjà créée dans V1)
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Table des utilisateurs
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    uuid UUID NOT NULL UNIQUE DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(100) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
@@ -23,15 +22,14 @@ CREATE TABLE users (
 
 -- Table des catégories
 CREATE TABLE categories (
-    id SERIAL PRIMARY KEY,
-    uuid UUID NOT NULL UNIQUE DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(100) NOT NULL,
     description TEXT,
-    parent_id INTEGER,
+    parent_id UUID,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    created_by INTEGER,
-    updated_by INTEGER,
+    created_by UUID,
+    updated_by UUID,
     deleted_at TIMESTAMP,
     FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE SET NULL,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
@@ -40,8 +38,7 @@ CREATE TABLE categories (
 
 -- Table des quiz
 CREATE TABLE quizzes (
-    id SERIAL PRIMARY KEY,
-    uuid UUID NOT NULL UNIQUE DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title VARCHAR(255) NOT NULL,
     description TEXT,
     difficulty_level VARCHAR(20) CHECK (difficulty_level IN ('BEGINNER', 'EASY', 'MEDIUM', 'HARD', 'EXPERT')),
@@ -49,11 +46,11 @@ CREATE TABLE quizzes (
     passing_score NUMERIC(5,2), -- Score minimum pour réussir (pourcentage)
     status VARCHAR(20) NOT NULL DEFAULT 'DRAFT' CHECK (status IN ('DRAFT', 'PUBLISHED', 'ARCHIVED', 'REVIEWING')),
     is_public BOOLEAN DEFAULT FALSE,
-    category_id INTEGER,
+    category_id UUID,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    created_by INTEGER NOT NULL,
-    updated_by INTEGER,
+    created_by UUID NOT NULL,
+    updated_by UUID,
     deleted_at TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
@@ -62,19 +59,18 @@ CREATE TABLE quizzes (
 
 -- Table des tags
 CREATE TABLE tags (
-    id SERIAL PRIMARY KEY,
-    uuid UUID NOT NULL UNIQUE DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(50) NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by INTEGER,
+    created_by UUID,
     deleted_at TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- Table d'association quiz-tags
 CREATE TABLE quiz_tags (
-    quiz_id INTEGER NOT NULL,
-    tag_id INTEGER NOT NULL,
+    quiz_id UUID NOT NULL,
+    tag_id UUID NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (quiz_id, tag_id),
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
@@ -96,14 +92,40 @@ CREATE TRIGGER update_categories_timestamp BEFORE UPDATE ON categories FOR EACH 
 CREATE TRIGGER update_quizzes_timestamp BEFORE UPDATE ON quizzes FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 
 -- Indexes pour améliorer les performances
-CREATE INDEX idx_users_email ON users(email);
+-- Optimisés pour la recherche, le tri et les jointures
 CREATE INDEX idx_users_username ON users(username);
-CREATE INDEX idx_users_uuid ON users(uuid);
-CREATE INDEX idx_quizzes_uuid ON quizzes(uuid);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_is_active ON users(is_active) WHERE deleted_at IS NULL;
+CREATE INDEX idx_users_last_login ON users(last_login_at) WHERE deleted_at IS NULL;
+CREATE INDEX idx_users_name ON users(first_name, last_name) WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_categories_name ON categories(name) WHERE deleted_at IS NULL;
+CREATE INDEX idx_categories_parent_id ON categories(parent_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_categories_created_by ON categories(created_by) WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_quizzes_title ON quizzes(title) WHERE deleted_at IS NULL;
 CREATE INDEX idx_quizzes_status ON quizzes(status) WHERE deleted_at IS NULL;
+CREATE INDEX idx_quizzes_difficulty ON quizzes(difficulty_level) WHERE deleted_at IS NULL;
 CREATE INDEX idx_quizzes_category ON quizzes(category_id) WHERE deleted_at IS NULL;
-CREATE INDEX idx_quizzes_created_by ON quizzes(created_by);
+CREATE INDEX idx_quizzes_created_by ON quizzes(created_by) WHERE deleted_at IS NULL;
+CREATE INDEX idx_quizzes_public ON quizzes(is_public) WHERE status = 'PUBLISHED' AND deleted_at IS NULL;
+CREATE INDEX idx_quizzes_created_at ON quizzes(created_at) WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_tags_name ON tags(name) WHERE deleted_at IS NULL;
+CREATE INDEX idx_tags_created_by ON tags(created_by) WHERE deleted_at IS NULL;
+
+-- Index pour la table de jointure
+CREATE INDEX idx_quiz_tags_quiz_id ON quiz_tags(quiz_id);
+CREATE INDEX idx_quiz_tags_tag_id ON quiz_tags(tag_id);
 
 -- Insertion de données initiales (utilisateur administrateur par défaut)
-INSERT INTO users (username, email, password_hash, first_name, last_name, is_active)
-VALUES ('admin', 'admin@quizapi.fr', '$2a$10$vzOG/7w0vRSzI4QZuAj1OeNL1Y8C3LPGlI/UBUwQQeX1LhqOH0z2W', 'Admin', 'System', true);
+INSERT INTO users (id, username, email, password_hash, first_name, last_name, is_active)
+VALUES (
+    uuid_generate_v4(), 
+    'admin', 
+    'admin@quizapi.fr', 
+    '$2a$10$vzOG/7w0vRSzI4QZuAj1OeNL1Y8C3LPGlI/UBUwQQeX1LhqOH0z2W', 
+    'Admin', 
+    'System', 
+    true
+);

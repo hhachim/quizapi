@@ -1,29 +1,22 @@
 package fr.hachim.quizapi.core.repository;
 
-import fr.hachim.quizapi.core.model.Tag;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import fr.hachim.quizapi.core.model.Tag;
 
 /**
  * Repository pour l'entité Tag.
  * Fournit des méthodes d'accès aux données pour les tags.
  */
 @Repository
-public interface TagRepository extends JpaRepository<Tag, Long> {
-    
-    /**
-     * Recherche un tag par son UUID.
-     * 
-     * @param uuid L'UUID du tag
-     * @return Le tag trouvé (optionnel)
-     */
-    Optional<Tag> findByUuid(UUID uuid);
+public interface TagRepository extends JpaRepository<Tag, UUID> {
     
     /**
      * Recherche un tag par son nom.
@@ -47,7 +40,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
      * @param createdBy L'ID de l'utilisateur créateur
      * @return Liste des tags
      */
-    List<Tag> findByCreatedByAndDeletedAtIsNull(Long createdBy);
+    List<Tag> findByCreatedByAndDeletedAtIsNull(UUID createdBy);
     
     /**
      * Recherche tous les tags non supprimés.
@@ -72,7 +65,7 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
      */
     @Query("SELECT t FROM Tag t JOIN QuizTag qt ON t.id = qt.tagId " +
            "WHERE qt.quizId = :quizId AND t.deletedAt IS NULL")
-    List<Tag> findTagsByQuizId(@Param("quizId") Long quizId);
+    List<Tag> findTagsByQuizId(@Param("quizId") UUID quizId);
     
     /**
      * Recherche les tags populaires basés sur leur utilisation.
@@ -110,5 +103,5 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
            "JOIN QuizTag qt ON t.id = qt.tagId " +
            "JOIN Quiz q ON qt.quizId = q.id " +
            "WHERE q.createdBy = :userId AND t.deletedAt IS NULL AND q.deletedAt IS NULL")
-    List<Tag> findTagsUsedByUser(@Param("userId") Long userId);
+    List<Tag> findTagsUsedByUser(@Param("userId") UUID userId);
 }

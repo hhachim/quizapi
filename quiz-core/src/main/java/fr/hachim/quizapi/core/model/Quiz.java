@@ -14,7 +14,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -29,11 +28,9 @@ import lombok.Data;
 public class Quiz {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(nullable = false, unique = true)
-    private UUID uuid;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
     
     @Column(nullable = false)
     private String title;
@@ -68,23 +65,13 @@ public class Quiz {
     private LocalDateTime updatedAt;
     
     @Column(name = "created_by", nullable = false)
-    private Long createdBy;
+    private UUID createdBy;
     
     @Column(name = "updated_by")
-    private Long updatedBy;
+    private UUID updatedBy;
     
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
-    
-    /**
-     * Méthode appelée avant la persistance pour initialiser l'UUID s'il n'est pas défini.
-     */
-    @PrePersist
-    public void prePersist() {
-        if (this.uuid == null) {
-            this.uuid = UUID.randomUUID();
-        }
-    }
     
     /**
      * Méthode appelée avant la mise à jour pour mettre à jour le timestamp.

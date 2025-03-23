@@ -1,29 +1,22 @@
 package fr.hachim.quizapi.core.repository;
 
-import fr.hachim.quizapi.core.model.Category;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import fr.hachim.quizapi.core.model.Category;
 
 /**
  * Repository pour l'entité Category.
  * Fournit des méthodes d'accès aux données pour les catégories.
  */
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Long> {
-    
-    /**
-     * Recherche une catégorie par son UUID.
-     * 
-     * @param uuid L'UUID de la catégorie
-     * @return La catégorie trouvée (optionnel)
-     */
-    Optional<Category> findByUuid(UUID uuid);
+public interface CategoryRepository extends JpaRepository<Category, UUID> {
     
     /**
      * Recherche des catégories par nom (recherche exacte).
@@ -54,7 +47,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
      * @param parentId L'ID de la catégorie parente
      * @return Liste des sous-catégories
      */
-    List<Category> findByParentIdAndDeletedAtIsNull(Long parentId);
+    List<Category> findByParentIdAndDeletedAtIsNull(UUID parentId);
     
     /**
      * Recherche des catégories par créateur.
@@ -62,7 +55,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
      * @param createdBy L'ID de l'utilisateur créateur
      * @return Liste des catégories
      */
-    List<Category> findByCreatedByAndDeletedAtIsNull(Long createdBy);
+    List<Category> findByCreatedByAndDeletedAtIsNull(UUID createdBy);
     
     /**
      * Vérifie si une catégorie a des sous-catégories.
@@ -71,7 +64,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
      * @return Le nombre de sous-catégories
      */
     @Query("SELECT COUNT(c) FROM Category c WHERE c.parentId = :categoryId AND c.deletedAt IS NULL")
-    Long countSubcategories(@Param("categoryId") Long categoryId);
+    Long countSubcategories(@Param("categoryId") UUID categoryId);
     
     /**
      * Compte le nombre de quiz dans une catégorie.
@@ -80,7 +73,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
      * @return Le nombre de quiz
      */
     @Query("SELECT COUNT(q) FROM Quiz q WHERE q.category.id = :categoryId AND q.deletedAt IS NULL")
-    Long countQuizzesByCategory(@Param("categoryId") Long categoryId);
+    Long countQuizzesByCategory(@Param("categoryId") UUID categoryId);
     
     /**
      * Recherche toutes les catégories non supprimées.
@@ -116,5 +109,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
                    "SELECT * FROM category_hierarchy WHERE id != :categoryId " +
                    "ORDER BY id DESC", 
                    nativeQuery = true)
-    List<Category> findAncestorHierarchy(@Param("categoryId") Long categoryId);
+    List<Category> findAncestorHierarchy(@Param("categoryId") UUID categoryId);
 }

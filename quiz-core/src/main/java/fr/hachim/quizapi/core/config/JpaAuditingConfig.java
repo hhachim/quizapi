@@ -1,6 +1,7 @@
 package fr.hachim.quizapi.core.config;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,9 +24,9 @@ public class JpaAuditingConfig {
      * @return Instance d'AuditorAware
      */
     @Bean
-    public AuditorAware<Long> auditorProvider() {
-        // Pour l'instant, on retourne l'ID 1 (admin) comme utilisateur par défaut
-        // À remplacer par l'implémentation réelle une fois l'authentification en place
-        return () -> Optional.of(1L);
+    public AuditorAware<UUID> auditorProvider() {
+        // Pour l'instant, on retourne un UUID fixe pour l'administrateur par défaut
+        // Cet ID correspond à celui inséré dans le script SQL de migration
+        return () -> Optional.of(UUID.fromString("00000000-0000-0000-0000-000000000001"));
     }
 }

@@ -1,6 +1,7 @@
 package fr.hachim.quizapi.core.repository;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -24,7 +25,7 @@ public interface QuizTagRepository extends JpaRepository<QuizTag, QuizTagId> {
      * @param quizId L'ID du quiz
      * @return Liste des associations quiz-tag
      */
-    List<QuizTag> findByQuizId(Long quizId);
+    List<QuizTag> findByQuizId(UUID quizId);
     
     /**
      * Trouve tous les quiz associés à un tag.
@@ -32,7 +33,7 @@ public interface QuizTagRepository extends JpaRepository<QuizTag, QuizTagId> {
      * @param tagId L'ID du tag
      * @return Liste des associations quiz-tag
      */
-    List<QuizTag> findByTagId(Long tagId);
+    List<QuizTag> findByTagId(UUID tagId);
     
     /**
      * Supprime toutes les associations pour un quiz.
@@ -41,7 +42,7 @@ public interface QuizTagRepository extends JpaRepository<QuizTag, QuizTagId> {
      */
     @Modifying
     @Query("DELETE FROM QuizTag qt WHERE qt.quizId = :quizId")
-    void deleteByQuizId(@Param("quizId") Long quizId);
+    void deleteByQuizId(@Param("quizId") UUID quizId);
     
     /**
      * Supprime toutes les associations pour un tag.
@@ -50,7 +51,7 @@ public interface QuizTagRepository extends JpaRepository<QuizTag, QuizTagId> {
      */
     @Modifying
     @Query("DELETE FROM QuizTag qt WHERE qt.tagId = :tagId")
-    void deleteByTagId(@Param("tagId") Long tagId);
+    void deleteByTagId(@Param("tagId") UUID tagId);
     
     /**
      * Vérifie si une association existe.
@@ -59,7 +60,7 @@ public interface QuizTagRepository extends JpaRepository<QuizTag, QuizTagId> {
      * @param tagId L'ID du tag
      * @return true si l'association existe, false sinon
      */
-    boolean existsByQuizIdAndTagId(Long quizId, Long tagId);
+    boolean existsByQuizIdAndTagId(UUID quizId, UUID tagId);
     
     /**
      * Compte le nombre de quiz associés à un tag.
@@ -68,7 +69,7 @@ public interface QuizTagRepository extends JpaRepository<QuizTag, QuizTagId> {
      * @return Le nombre de quiz
      */
     @Query("SELECT COUNT(qt.quizId) FROM QuizTag qt WHERE qt.tagId = :tagId")
-    Long countQuizzesByTagId(@Param("tagId") Long tagId);
+    Long countQuizzesByTagId(@Param("tagId") UUID tagId);
     
     /**
      * Compte le nombre de tags associés à un quiz.
@@ -77,5 +78,5 @@ public interface QuizTagRepository extends JpaRepository<QuizTag, QuizTagId> {
      * @return Le nombre de tags
      */
     @Query("SELECT COUNT(qt.tagId) FROM QuizTag qt WHERE qt.quizId = :quizId")
-    Long countTagsByQuizId(@Param("quizId") Long quizId);
+    Long countTagsByQuizId(@Param("quizId") UUID quizId);
 }

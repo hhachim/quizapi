@@ -1,6 +1,7 @@
 package fr.hachim.quizapi.core.model;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -34,11 +35,11 @@ public abstract class BaseEntity {
     
     @CreatedBy
     @Column(name = "created_by")
-    private Long createdBy;
+    private UUID createdBy;
     
     @LastModifiedBy
     @Column(name = "updated_by")
-    private Long updatedBy;
+    private UUID updatedBy;
     
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
