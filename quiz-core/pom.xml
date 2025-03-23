@@ -27,6 +27,11 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>3.1.0</version> <!-- Ou la version compatible avec Spring Boot 3.4.4 -->
+        </dependency>
         <!-- Lombok is already in parent -->
         <dependency>
             <groupId>org.projectlombok</groupId>
