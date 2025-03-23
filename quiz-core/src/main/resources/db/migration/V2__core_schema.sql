@@ -77,6 +77,18 @@ CREATE TABLE quiz_tags (
     FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
 
+CREATE TABLE plugins (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    version TEXT NOT NULL,
+    description TEXT,
+    enabled BOOLEAN NOT NULL DEFAULT false,
+    config JSONB DEFAULT '{}'::jsonb,
+    installed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    last_enabled_at TIMESTAMPTZ,
+    last_disabled_at TIMESTAMPTZ
+);
+
 -- Fonction pour mettre à jour les timestamps des enregistrements modifiés
 CREATE OR REPLACE FUNCTION update_timestamp()
 RETURNS TRIGGER AS $$
