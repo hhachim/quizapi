@@ -10,7 +10,7 @@
     </parent>
     
     <artifactId>quiz-api-app</artifactId>
-    <!-- <n>Quiz API - Application</n> -->
+    <name>Quiz API - Application</name>
     <description>Application principale regroupant le core et les plugins</description>
     
     <dependencies>
@@ -31,6 +31,14 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        
+        <!-- Dev Tools -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
     
