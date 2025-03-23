@@ -60,23 +60,13 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public Page<Quiz> findQuizzesByCategory(UUID categoryId, Pageable pageable) {
-        return quizRepository.findAll((root, query, cb) -> 
-            cb.and(
-                cb.equal(root.get("category").get("id"), categoryId),
-                cb.isNull(root.get("deletedAt"))
-            ), pageable);
+        return quizRepository.findByCategoryIdAndDeletedAtIsNull(categoryId, pageable);
     }
 
     @Override
     public Page<Quiz> findQuizzesByTag(UUID tagId, Pageable pageable) {
-        return quizRepository.findAll((root, query, cb) -> {
-            query.distinct(true);
-            var join = root.join("quizTags");
-            return cb.and(
-                cb.equal(join.get("tagId"), tagId),
-                cb.isNull(root.get("deletedAt"))
-            );
-        }, pageable);
+        // Pour cette méthode, nous devons ajouter une méthode personnalisée au repository
+        return quizRepository.findQuizzesByTagId(tagId, pageable);
     }
 
     @Override

@@ -143,5 +143,15 @@ public interface QuizRepository extends JpaRepository<Quiz, UUID> {
      * @return Page de quiz correspondants
      */
     Page<Quiz> findByCategoryIdAndDeletedAtIsNull(UUID categoryId, Pageable pageable);
-
+    
+    /**
+     * Récupère les quiz avec un tag spécifique, avec pagination.
+     * 
+     * @param tagId ID du tag
+     * @param pageable Options de pagination
+     * @return Page de quiz correspondants
+     */
+    @Query("SELECT DISTINCT q FROM Quiz q JOIN QuizTag qt ON q.id = qt.quizId " +
+           "WHERE qt.tagId = :tagId AND q.deletedAt IS NULL")
+    Page<Quiz> findQuizzesByTagId(@Param("tagId") UUID tagId, Pageable pageable);
 }
