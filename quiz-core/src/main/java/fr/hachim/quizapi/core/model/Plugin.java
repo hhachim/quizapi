@@ -18,32 +18,32 @@ import java.util.Map;
 @Table(name = "plugins")
 public class Plugin {
 
-    @Id
-    @Column(name = "id", nullable = false)
-    private String id;
+    // @Id
+    // @Column(name = "id", nullable = false)
+    // private String id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    // @Column(name = "name", nullable = false)
+    // private String name;
 
-    @Column(name = "version", nullable = false)
-    private String version;
+    // @Column(name = "version", nullable = false)
+    // private String version;
 
-    @Column(name = "description")
-    private String description;
+    // @Column(name = "description")
+    // private String description;
 
-    @Column(name = "enabled", nullable = false)
-    private boolean enabled = false;
+    // @Column(name = "enabled", nullable = false)
+    // private boolean enabled = false;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "config", columnDefinition = "jsonb")
-    private Map<String, Object> config = new HashMap<>();
+    // @JdbcTypeCode(SqlTypes.JSON)
+    // @Column(name = "config", columnDefinition = "jsonb")
+    // private Map<String, Object> config = new HashMap<>();
 
-    @Column(name = "installed_at", nullable = false)
-    private LocalDateTime installedAt = LocalDateTime.now();
+    // @Column(name = "installed_at", nullable = false)
+    // private LocalDateTime installedAt = LocalDateTime.now();
 
-    @Column(name = "last_enabled_at")
-    private LocalDateTime lastEnabledAt;
+    // @Column(name = "last_enabled_at")
+    // private LocalDateTime lastEnabledAt;
 
-    @Column(name = "last_disabled_at")
-    private LocalDateTime lastDisabledAt;
+    // @Column(name = "last_disabled_at")
+    // private LocalDateTime lastDisabledAt;
 }
