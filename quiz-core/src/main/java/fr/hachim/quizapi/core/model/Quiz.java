@@ -2,7 +2,6 @@ package fr.hachim.quizapi.core.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Locale.Category;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
