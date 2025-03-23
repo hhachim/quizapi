@@ -134,3 +134,4 @@ public class QuizMapper {
             quiz.setCategory(category);
         }
     }
+}

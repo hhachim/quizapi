@@ -24,6 +24,8 @@ import fr.hachim.quizapi.core.dto.ApiResponse;
 import fr.hachim.quizapi.core.dto.PageResponse;
 import fr.hachim.quizapi.core.dto.QuizCreationDTO;
 import fr.hachim.quizapi.core.dto.QuizDTO;
+import fr.hachim.quizapi.core.exception.BusinessException;
+import fr.hachim.quizapi.core.exception.ResourceNotFoundException;
 import fr.hachim.quizapi.core.mapper.QuizMapper;
 import fr.hachim.quizapi.core.model.Category;
 import fr.hachim.quizapi.core.model.Quiz;
@@ -229,3 +231,46 @@ public class QuizController {
                     .body(ApiResponse.error("Quiz non trouvé"));
         }
     }
+
+    /**
+     * Publie un quiz.
+     */
+    @PostMapping("/{id}/publish")
+    public ResponseEntity<ApiResponse<QuizDTO>> publishQuiz(@PathVariable UUID id) {
+        try {
+            Quiz publishedQuiz = quizService.publishQuiz(id);
+            List<Tag> tags = tagService.findTagsByQuizId(publishedQuiz.getId());
+            
+            return ResponseEntity.ok(ApiResponse.success(
+                    quizMapper.toDTOWithTags(publishedQuiz, tags.stream().collect(Collectors.toSet())), 
+                    "Quiz publié avec succès"));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (BusinessException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
+        }
+    }
+    
+    /**
+     * Archive un quiz.
+     */
+    @PostMapping("/{id}/archive")
+    public ResponseEntity<ApiResponse<QuizDTO>> archiveQuiz(@PathVariable UUID id) {
+        try {
+            Quiz archivedQuiz = quizService.archiveQuiz(id);
+            List<Tag> tags = tagService.findTagsByQuizId(archivedQuiz.getId());
+            
+            return ResponseEntity.ok(ApiResponse.success(
+                    quizMapper.toDTOWithTags(archivedQuiz, tags.stream().collect(Collectors.toSet())), 
+                    "Quiz archivé avec succès"));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getMessage()));
+        } catch (BusinessException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
+        }
+    }
+}
